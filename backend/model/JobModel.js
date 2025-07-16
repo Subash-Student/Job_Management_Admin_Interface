@@ -13,6 +13,9 @@ const jobSchema = new mongoose.Schema({
         required: [true, 'Company Name is required'], 
         trim: true
     },
+    imageUrl: {
+        type: String,
+    },
     location: {
         type: String,
         required: [true, 'Location is required'], 
@@ -27,6 +30,11 @@ const jobSchema = new mongoose.Schema({
     salaryRange: {
         type: String, 
         required: [true, 'Salary Range is required'], 
+        trim: true
+    },
+    jobExperience: {
+        type: String,
+        required: [true, 'Job Experience is required'], // Make it required
         trim: true
     },
     jobDescription: {

@@ -1,7 +1,7 @@
 import express from "express"
 import rateLimit from 'express-rate-limit';
-import { createJob, getJobById, getJobs } from "../controller/jobController";
-
+import { createJob, getJobById, getJobs } from "../controller/jobController.js";
+import multer from "multer"
 
 
 const limiter = rateLimit({
@@ -14,11 +14,11 @@ const jobRouter = express.Router();
 
 jobRouter.use(limiter);
 
-router.post("/create",createJob)
+jobRouter.post("/create",multer().single("image"),createJob)
      
-router.get("/",getJobs);
+jobRouter.get("/",getJobs);
 
-router.get("/:id",getJobById);
+jobRouter.get("/:id",getJobById);
 
 
 export default jobRouter;
