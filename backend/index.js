@@ -2,6 +2,7 @@ import express from "express"
 import cors from "cors"
 import connectDB from "./config/db.js";
 import dotenv from "dotenv";
+import jobRouter from "./routes/jobRoutes.js";
 dotenv.config()
 
 
@@ -29,6 +30,7 @@ app.get("/",(req,res)=>{
     res.send("API WORKING");
 });
 
+app.use("/api/jobs",jobRouter);
 
 connectDB().then(()=>{
     app.listen(PORT,()=>{
