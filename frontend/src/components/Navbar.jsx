@@ -1,9 +1,13 @@
-import React from 'react';
+import React, { useContext } from 'react';
+import { JobContext } from '../context/JobContext';
 
 
 const logoPlaceholder = "cybermind_works_logo.jpeg"; 
 
 function Navbar() {
+
+  const {handleOpenCreateJobModal} = useContext(JobContext)
+
   return (
     
     <nav className="flex justify-center py-4 px-4 sm:px-6 lg:px-8">
@@ -31,7 +35,7 @@ function Navbar() {
 
         
         <div>
-          <button className="bg-purple-700 hover:bg-purple-800 text-white font-semibold py-2 px-6 rounded-full shadow-md transition-colors duration-200">
+          <button onClick={handleOpenCreateJobModal} className="bg-purple-700 hover:bg-purple-800 text-white font-semibold py-2 px-6 rounded-full shadow-md transition-colors duration-200">
             Create Jobs
           </button>
         </div>
