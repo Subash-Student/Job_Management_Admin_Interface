@@ -47,7 +47,7 @@ export const getJobs = async (req, res) => {
       maxSalary = ''
     } = req.query;
 
-    console.log(req.query)
+  
     // Fetch all jobs first
     let jobs = await JobModel.find().sort({ createdAt: -1 });
 

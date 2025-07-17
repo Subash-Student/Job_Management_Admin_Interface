@@ -47,7 +47,6 @@ const CreateJobModal = () => {
       minSalary:data.minSalary,
       maxSalary:data.maxSalary
     };
-    console.log("Form Data:", formattedData);
     
     handleCreateJobSubmit(formattedData)
 
