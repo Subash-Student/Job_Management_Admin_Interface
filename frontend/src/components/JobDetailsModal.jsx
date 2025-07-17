@@ -1,11 +1,14 @@
 // components/JobDetailsModal.js (or a suitable path like modals/JobDetailsModal.js)
 
-import React, { useState } from 'react';
+import React, { useContext, useState } from 'react';
+import { JobContext } from '../context/JobContext';
 
 
 const JobDetailsModal = ({ job, onClose }) => {
   if (!job) return null; // Don't render if no job is provided
   const [isApplied, setIsApplied] = useState(false);
+
+  const {formatSalaryRange} = useContext(JobContext)
 
   // Format application deadline
   const formattedDeadline = new Date(job.applicationDeadline).toLocaleDateString('en-US', {
@@ -83,7 +86,7 @@ const JobDetailsModal = ({ job, onClose }) => {
                     e.target.src = "https://placehold.co/16x16/cccccc/000000?text=S";
                   }}
                 />
-                <span>{job.salaryRange}</span>
+                <span>{formatSalaryRange(job.minSalary,job.maxSalary)}</span>
               </div>
           <div className="flex items-center">
             <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="mr-2 text-gray-500">

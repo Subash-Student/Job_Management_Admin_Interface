@@ -105,6 +105,32 @@ const JobProvider = ({ children }) => {
     setCurrentFilters(filters);
   };
 
+  const formatSalaryRange = (min, max) => {
+
+    const minSalaryRaw = parseFloat(min.replace(/[^0-9.]/g, "")); 
+    const maxSalaryRaw = parseFloat(max.replace(/[^0-9.]/g, ""));
+    
+      const inLakhs = minSalaryRaw >= 100000 && maxSalaryRaw >= 100000;
+      const inThousands = minSalaryRaw >= 1000 && maxSalaryRaw >= 1000 && min < 100000 && max < 100000;
+    
+      if (inLakhs) {
+        return `${(minSalaryRaw / 100000)}-${(maxSalaryRaw / 100000)} LPA`;
+      } else if (inThousands) {
+        return `${Math.round(minSalaryRaw / 1000)}-${Math.round(maxSalaryRaw / 1000)}k Per Month`;
+      } else {
+        // Mixed or smaller numbers
+        const formatSingle = (amount) =>
+          amount >= 100000
+            ? `${(amount / 100000).toFixed(1)} LPA`
+            : amount >= 1000
+            ? `${Math.round(amount / 1000)}K`
+            : `₹${amount}`;
+        return `${formatSingle(minSalaryRaw)} - ${formatSingle(maxSalaryRaw)}`;
+      }
+    };
+
+
+
   const values = {
     jobs,
     showCreateJobModal,
@@ -113,6 +139,7 @@ const JobProvider = ({ children }) => {
     isLoading,
     handleCreateJobSubmit,
     triggerJobFetch, 
+    formatSalaryRange
   };
 
   return (
