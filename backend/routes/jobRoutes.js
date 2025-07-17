@@ -12,7 +12,7 @@ const limiter = rateLimit({
 
 const jobRouter = express.Router(); 
 
-// jobRouter.use(limiter);
+jobRouter.use(limiter);
 
 jobRouter.post("/create",multer().single("image"),createJob)
      

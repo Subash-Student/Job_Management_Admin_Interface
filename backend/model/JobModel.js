@@ -27,9 +27,14 @@ const jobSchema = new mongoose.Schema({
         enum: ['Full-time', 'Part-time', 'Contract', 'Internship'], 
         default: 'Full-time'
     },
-    salaryRange: {
+    minSalary: {
         type: String, 
-        required: [true, 'Salary Range is required'], 
+        required: [true, 'Minimum Salary Range is required'], 
+        trim: true
+    },
+    maxSalary: {
+        type: String, 
+        required: [true, 'Maximum Salary Range is required'], 
         trim: true
     },
     jobExperience: {

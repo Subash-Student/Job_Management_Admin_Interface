@@ -5,25 +5,7 @@ import { Calendar } from 'lucide-react';
 import { JobContext } from '../context/JobContext';
 
 
-const formatSalaryRange = (min, max) => {
-  const inLakhs = min >= 100000 && max >= 100000;
-  const inThousands = min >= 1000 && max >= 1000 && min < 100000 && max < 100000;
 
-  if (inLakhs) {
-    return `${(min / 100000)}-${(max / 100000)} LPA`;
-  } else if (inThousands) {
-    return `${Math.round(min / 1000)}-${Math.round(max / 1000)} K`;
-  } else {
-    // Mixed or smaller numbers
-    const formatSingle = (amount) =>
-      amount >= 100000
-        ? `${(amount / 100000).toFixed(1)} LPA`
-        : amount >= 1000
-        ? `${Math.round(amount / 1000)}K`
-        : `₹${amount}`;
-    return `${formatSingle(min)} - ${formatSingle(max)}`;
-  }
-};
 
 const CreateJobModal = () => {
   // Set default value for jobType to "Full-time"
@@ -42,8 +24,7 @@ const CreateJobModal = () => {
   // Function to handle form submission
   const handleFormSubmit = (data) => {
     // Convert salary strings to numbers
-    const minSalaryRaw = parseFloat(data.minSalary.replace(/[^0-9.]/g, "")); // Remove all non-numeric except dot
-    const maxSalaryRaw = parseFloat(data.maxSalary.replace(/[^0-9.]/g, ""));
+    
 
     // Experience values are already numbers due to type="number"
     const minExperience = parseFloat(data.minExperience);
@@ -63,7 +44,8 @@ const CreateJobModal = () => {
       jobType: data.jobType,
       location: data.location,
       jobExperience: `${minExperience}-${maxExperience} yr Exp`,
-      salaryRange: formatSalaryRange(minSalaryRaw, maxSalaryRaw)
+      minSalary:data.minSalary,
+      maxSalary:data.maxSalary
     };
     console.log("Form Data:", formattedData);
     
@@ -167,7 +149,7 @@ const CreateJobModal = () => {
           {/* Salary Range (Min & Max) */}
           <div className="flex gap-4">
             <div className="flex-1">
-              <label htmlFor="minSalary" className="block text-gray-700 text-sm font-medium mb-1">Min Salary (Per Month)</label>
+              <label htmlFor="minSalary" className="block text-gray-700 text-sm font-medium mb-1">Min Salary (Per Year)</label>
               <div className="flex items-center border border-gray-300 rounded-md p-3 text-gray-800 focus-within:ring-2 focus-within:ring-blue-500 focus-within:border-transparent">
                 <span className="text-gray-500 mr-2">₹</span>
                 <input
@@ -187,7 +169,7 @@ const CreateJobModal = () => {
               {errors.minSalary && <p className="text-red-500 text-xs mt-1">{errors.minSalary.message}</p>}
             </div>
             <div className="flex-1">
-              <label htmlFor="maxSalary" className="block text-gray-700 text-sm font-medium mb-1">Max Salary (Per Month)</label>
+              <label htmlFor="maxSalary" className="block text-gray-700 text-sm font-medium mb-1">Max Salary (Per Year)</label>
               <div className="flex items-center border border-gray-300 rounded-md p-3 text-gray-800 focus-within:ring-2 focus-within:ring-blue-500 focus-within:border-transparent">
                 <span className="text-gray-500 mr-2">₹</span>
                 <input

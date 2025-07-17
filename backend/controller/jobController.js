@@ -35,57 +35,79 @@ export const createJob = async (req, res) => {
 };
 
 
+
+
 export const getJobs = async (req, res) => {
-    try {
-        
-        const query = {};
+  try {
+    const {
+      jobTitle = '',
+      location = '',
+      jobType = '',
+      minSalary = '',
+      maxSalary = ''
+    } = req.query;
 
-        const { jobTitle, location, jobType, minSalary, maxSalary } = req.query;
-       
-        if (jobTitle) {            
-            query.jobTitle = { $regex: jobTitle, $options: 'i' };
-        }
-        if (location) {
-            query.location = { $regex: location, $options: 'i' };
-        }
-        if (jobType) {
-            query.jobType = jobType;
-        }
+    console.log(req.query)
+    // Fetch all jobs first
+    let jobs = await JobModel.find().sort({ createdAt: -1 });
 
-        if (minSalary || maxSalary) {
-            query.salaryRange = { $exists: true }; 
-            if (minSalary) {
-                query.salaryRange.$regex = `^${minSalary}|${minSalary}\\s*-`; 
-                query.salaryRange.$options = 'i';
-            }
-            if (maxSalary) { 
-                if (query.salaryRange.$regex) {
-                    query.salaryRange.$regex += `|-${maxSalary}$`; 
-                } else {
-                    query.salaryRange.$regex = `-${maxSalary}$`;
-                }
-                query.salaryRange.$options = 'i';
-            }
-        }
+    // Normalize input
+    const normalize = (str) =>
+      str.toString().trim().toLowerCase().replace(/\s+/g, '');
 
+    const normalizedJobTitle = normalize(jobTitle);
+    const normalizedLocation = normalize(location);
+    const normalizedJobType = normalize(jobType);
 
-        
-        const jobs = await JobModel.find(query).sort({ createdAt: -1 });
+    const minS = parseInt(minSalary);
+    const maxS = parseInt(maxSalary);
 
-        
-        res.status(200).json({
-            success: true,
-            count: jobs.length,
-            data: jobs
-        });
-    } catch (error) {
-        console.error(error);
-        res.status(500).json({
-            success: false,
-            message: 'Failed to retrieve job postings'
-        });
-    }
+    // Apply filter manually
+    const filteredJobs = jobs.filter((job) => {
+      const jobTitleNorm = normalize(job.jobTitle);
+      const locationNorm = normalize(job.location);
+      const jobTypeNorm = normalize(job.jobType);
+
+      let match = true;
+
+      if (normalizedJobTitle && !jobTitleNorm.includes(normalizedJobTitle)) {
+        match = false;
+      }
+
+      if (normalizedLocation && !locationNorm.includes(normalizedLocation)) {
+        match = false;
+      }
+
+      if (normalizedJobType && jobTypeNorm !== normalizedJobType) {
+        match = false;
+      }
+
+      if ((minSalary || maxSalary) && job.minSalary && job.maxSalary) {
+        const min = job.minSalary;
+        const max = job.maxSalary;
+        if (minSalary && max < minS) match = false;
+        if (maxSalary && min > maxS) match = false;
+      }
+
+      return match;
+    });
+
+    res.status(200).json({
+      success: true,
+      count: filteredJobs.length,
+      data: filteredJobs,
+    });
+
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({
+      success: false,
+      message: 'Failed to retrieve job postings',
+    });
+  }
 };
+
+
 
 
 export const getJobById = async (req, res) => {
@@ -149,3 +171,9 @@ const uploadImageToCloudinary = async (file) => {
         streamifier.createReadStream(file.buffer).pipe(stream);
     });
 };
+
+
+
+
+
+

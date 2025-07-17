@@ -37,7 +37,7 @@ const JobDetailsModal = ({ job, onClose }) => {
           </div>
           <div>
             <h2 className="text-2xl font-bold text-gray-800">{job.jobTitle}</h2>
-            <p className="text-gray-600 text-lg">{job.companyName}</p>
+            <p className="text-gray-600 text-lg">{job.companyName} - {job.jobType}</p>
           </div>
         </div>
 
