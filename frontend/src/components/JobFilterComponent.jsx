@@ -66,7 +66,14 @@ export default function JobFilterBar() {
         <Select.Root value={selectedJobType} onValueChange={setSelectedJobType}>
           <Select.Trigger className="flex w-full items-center justify-between text-sm text-gray-700 bg-transparent outline-none appearance-none h-full"> {/* Removed pl-2, pr-2 from here */}
             <div className="flex items-center"> {/* This div now controls the spacing between icon and text */}
-              <Speech className="text-gray-500 flex-shrink-0 mr-3 ml-3" size={25} /> {/* Added mr-2 */}
+            <img
+                  src="speech.png" // Placeholder for salary.png
+                  alt="Salary Icon"
+                  className="mr-3 ml-3 text-gray-500"
+                  width="36"
+                  height="16"
+                  onError={(e) => { e.target.onerror = null; e.target.src = "https://placehold.co/16x16/cccccc/000000?text=S"; }}
+                />
               <Select.Value placeholder="Job type">
                 {selectedJobType === 'default-job-type' ? 'Job type' : selectedJobType}
               </Select.Value>
