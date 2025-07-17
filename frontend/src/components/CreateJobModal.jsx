@@ -1,32 +1,74 @@
 import React, { useContext } from 'react';
 import { useForm } from 'react-hook-form';
-import * as Select from '@radix-ui/react-select'; // For custom dropdowns
-import { Calendar } from 'lucide-react'; // For the calendar icon in date picker
+import * as Select from '@radix-ui/react-select';
+import { Calendar } from 'lucide-react';
 import { JobContext } from '../context/JobContext';
 
+
+const formatSalaryRange = (min, max) => {
+  const inLakhs = min >= 100000 && max >= 100000;
+  const inThousands = min >= 1000 && max >= 1000 && min < 100000 && max < 100000;
+
+  if (inLakhs) {
+    return `${(min / 100000)}-${(max / 100000)} LPA`;
+  } else if (inThousands) {
+    return `${Math.round(min / 1000)}-${Math.round(max / 1000)} K`;
+  } else {
+    // Mixed or smaller numbers
+    const formatSingle = (amount) =>
+      amount >= 100000
+        ? `${(amount / 100000).toFixed(1)} LPA`
+        : amount >= 1000
+        ? `${Math.round(amount / 1000)}K`
+        : `₹${amount}`;
+    return `${formatSingle(min)} - ${formatSingle(max)}`;
+  }
+};
+
 const CreateJobModal = () => {
-  const { register, handleSubmit, watch, setValue, formState: { errors } } = useForm();
+  // Set default value for jobType to "Full-time"
+  const { register, handleSubmit, watch, setValue, formState: { errors } } = useForm({
+    defaultValues: {
+      jobType: 'Full-time', 
+      
+    }
+  });
 
-  const {handleCloseCreateJobModal} = useContext(JobContext);
+  const {handleCloseCreateJobModal,handleCreateJobSubmit} = useContext(JobContext);
 
-  // Watch for changes in jobType and location for Radix Select
-  const jobType = watch('jobType', 'placeholder-job-type');
-  const location = watch('location', 'placeholder-location');
+  // Watch for changes in jobType for Radix Select display
+  const jobType = watch('jobType'); // No default here, as it's set in useForm
 
   // Function to handle form submission
   const handleFormSubmit = (data) => {
-    // Convert salary range strings to numbers if needed for backend
+    // Convert salary strings to numbers
+    const minSalaryRaw = parseFloat(data.minSalary.replace(/[^0-9.]/g, "")); // Remove all non-numeric except dot
+    const maxSalaryRaw = parseFloat(data.maxSalary.replace(/[^0-9.]/g, ""));
+
+    // Experience values are already numbers due to type="number"
+    const minExperience = parseFloat(data.minExperience);
+    const maxExperience = parseFloat(data.maxExperience);
+
+    // Get the first file from the FileList if one was uploaded
+    const companyLogoFile = data.companyLogo[0] || null;
+
     const formattedData = {
-      ...data,
-      minSalary: parseFloat(data.minSalary.replace(/[^0-9.-]+/g,"")), // Remove non-numeric chars
-      maxSalary: parseFloat(data.maxSalary.replace(/[^0-9.-]+/g,"")),
-      minExperience: parseFloat(data.minExperience), // Convert to number
-      maxExperience: parseFloat(data.maxExperience), // Convert to number
-      // Note: For file upload, data.companyLogo will be a FileList object.
-      // You'll typically send this via FormData in a real API call.
+      companyLogo: companyLogoFile,
+      jobTitle: data.jobTitle,
+      jobDescription: data.jobDescription,
+      requirements: data.requirements,
+      responsibilities: data.responsibilities,
+      applicationDeadline: data.applicationDeadline,
+      companyName: data.companyName,
+      jobType: data.jobType,
+      location: data.location,
+      jobExperience: `${minExperience}-${maxExperience} yr Exp`,
+      salaryRange: formatSalaryRange(minSalaryRaw, maxSalaryRaw)
     };
     console.log("Form Data:", formattedData);
-    // Pass data to parent component (e.g., Navbar or App)
+    
+    handleCreateJobSubmit(formattedData)
+
   };
 
   return (
@@ -70,53 +112,28 @@ const CreateJobModal = () => {
             {errors.companyName && <p className="text-red-500 text-xs mt-1">{errors.companyName.message}</p>}
           </div>
 
-          {/* Location Dropdown */}
+          {/* Location Input */}
           <div>
             <label htmlFor="location" className="block text-gray-700 text-sm font-medium mb-1">Location</label>
-            <Select.Root value={location} onValueChange={(value) => setValue('location', value)}>
-              <Select.Trigger className="flex w-full items-center justify-between text-sm text-gray-700 border border-gray-300 rounded-md p-3 bg-white outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
-                <Select.Value placeholder="Choose Preferred Location">
-                  {/* Display placeholder text if the value is the placeholder value */}
-                  {location === 'placeholder-location' ? 'Choose Preferred Location' : location}
-                </Select.Value>
-                <Select.Icon className="ml-2">
-                  <svg className="fill-current h-4 w-4 text-gray-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
-                    <path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 6.757 7.586 5.343 9z"/>
-                  </svg>
-                </Select.Icon>
-              </Select.Trigger>
-              <Select.Portal>
-                <Select.Content className="bg-white rounded-md shadow-lg py-1 z-50 min-w-[var(--radix-select-trigger-width)]">
-                  <Select.Viewport className="p-1">
-                    <Select.Item value="placeholder-location" className="text-sm text-gray-700 px-3 py-2 rounded-md hover:bg-gray-100 cursor-pointer outline-none data-[highlighted]:bg-gray-100">
-                      <Select.ItemText>Choose Preferred Location</Select.ItemText>
-                    </Select.Item>
-                    <Select.Item value="Onsite" className="text-sm text-gray-700 px-3 py-2 rounded-md hover:bg-gray-100 cursor-pointer outline-none data-[highlighted]:bg-gray-100">
-                      <Select.ItemText>Onsite</Select.ItemText>
-                    </Select.Item>
-                    <Select.Item value="Remote" className="text-sm text-gray-700 px-3 py-2 rounded-md hover:bg-gray-100 cursor-pointer outline-none data-[highlighted]:bg-gray-100">
-                      <Select.ItemText>Remote</Select.ItemText>
-                    </Select.Item>
-                    <Select.Item value="Hybrid" className="text-sm text-gray-700 px-3 py-2 rounded-md hover:bg-gray-100 cursor-pointer outline-none data-[highlighted]:bg-gray-100">
-                      <Select.ItemText>Hybrid</Select.ItemText>
-                    </Select.Item>
-                  </Select.Viewport>
-                </Select.Content>
-              </Select.Portal>
-            </Select.Root>
-            <input type="hidden" {...register("location", { required: "Location is required" })} /> {/* Hidden input for react-hook-form validation */}
+            <input
+              type="text"
+              id="location"
+              {...register("location", { required: "Location is required" })}
+              placeholder="Chennai, Bangalore, Kochi"
+              className="w-full border border-gray-300 rounded-md p-3 text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            />
             {errors.location && <p className="text-red-500 text-xs mt-1">{errors.location.message}</p>}
           </div>
 
-          {/* Job Type Dropdown */}
+          {/* Job Type Dropdown (Radix UI Select) */}
           <div>
             <label htmlFor="jobType" className="block text-gray-700 text-sm font-medium mb-1">Job Type</label>
-            <Select.Root value={jobType} onValueChange={(value) => setValue('jobType', value)}>
+            <Select.Root
+              value={jobType}
+              onValueChange={(value) => setValue('jobType', value, { shouldValidate: true })} // Trigger validation on change
+            >
               <Select.Trigger className="flex w-full items-center justify-between text-sm text-gray-700 border border-gray-300 rounded-md p-3 bg-white outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
-                <Select.Value placeholder="Full-time">
-                  {/* Display placeholder text if the value is the placeholder value */}
-                  {jobType === 'placeholder-job-type' ? 'Full-time' : jobType}
-                </Select.Value>
+                <Select.Value>{jobType}</Select.Value> {/* Displays current value */}
                 <Select.Icon className="ml-2">
                   <svg className="fill-current h-4 w-4 text-gray-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
                     <path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 6.757 7.586 5.343 9z"/>
@@ -126,7 +143,7 @@ const CreateJobModal = () => {
               <Select.Portal>
                 <Select.Content className="bg-white rounded-md shadow-lg py-1 z-50 min-w-[var(--radix-select-trigger-width)]">
                   <Select.Viewport className="p-1">
-                    <Select.Item value="placeholder-job-type" className="text-sm text-gray-700 px-3 py-2 rounded-md hover:bg-gray-100 cursor-pointer outline-none data-[highlighted]:bg-gray-100">
+                    <Select.Item value="Full-time" className="text-sm text-gray-700 px-3 py-2 rounded-md hover:bg-gray-100 cursor-pointer outline-none data-[highlighted]:bg-gray-100">
                       <Select.ItemText>Full-time</Select.ItemText>
                     </Select.Item>
                     <Select.Item value="Part-time" className="text-sm text-gray-700 px-3 py-2 rounded-md hover:bg-gray-100 cursor-pointer outline-none data-[highlighted]:bg-gray-100">
@@ -142,65 +159,91 @@ const CreateJobModal = () => {
                 </Select.Content>
               </Select.Portal>
             </Select.Root>
-            <input type="hidden" {...register("jobType", { required: "Job Type is required" })} /> {/* Hidden input for react-hook-form validation */}
+            {/* Hidden input to ensure react-hook-form registers the field. Value is set via setValue. */}
+            <input type="hidden" {...register("jobType", { required: "Job Type is required" })} />
             {errors.jobType && <p className="text-red-500 text-xs mt-1">{errors.jobType.message}</p>}
           </div>
 
           {/* Salary Range (Min & Max) */}
-          <div className="flex gap-4"> {/* Use flex and gap for half-half sizing */}
-            <div className="flex-1"> {/* flex-1 makes it take half available space */}
-              <label htmlFor="minSalary" className="block text-gray-700 text-sm font-medium mb-1">Min Salary</label>
+          <div className="flex gap-4">
+            <div className="flex-1">
+              <label htmlFor="minSalary" className="block text-gray-700 text-sm font-medium mb-1">Min Salary (Per Month)</label>
               <div className="flex items-center border border-gray-300 rounded-md p-3 text-gray-800 focus-within:ring-2 focus-within:ring-blue-500 focus-within:border-transparent">
                 <span className="text-gray-500 mr-2">₹</span>
                 <input
-                  type="text"
+                  type="text" // Keep as text to allow currency formatting input
                   id="minSalary"
-                  {...register("minSalary", { required: "Min Salary is required" })}
-                  placeholder="₹0"
+                  {...register("minSalary", {
+                    required: "Min Salary is required",
+                    pattern: {
+                      value: /^[0-9]+(\.[0-9]{1,2})?$/, // Basic regex for numbers (optional decimals)
+                      message: "Invalid salary format"
+                    }
+                  })}
+                  placeholder="0"
                   className="w-full border-none outline-none bg-transparent"
                 />
               </div>
               {errors.minSalary && <p className="text-red-500 text-xs mt-1">{errors.minSalary.message}</p>}
             </div>
-            <div className="flex-1"> {/* flex-1 makes it take half available space */}
-              <label htmlFor="maxSalary" className="block text-gray-700 text-sm font-medium mb-1">Max Salary</label>
+            <div className="flex-1">
+              <label htmlFor="maxSalary" className="block text-gray-700 text-sm font-medium mb-1">Max Salary (Per Month)</label>
               <div className="flex items-center border border-gray-300 rounded-md p-3 text-gray-800 focus-within:ring-2 focus-within:ring-blue-500 focus-within:border-transparent">
                 <span className="text-gray-500 mr-2">₹</span>
                 <input
-                  type="text"
+                  type="text" // Keep as text to allow currency formatting input
                   id="maxSalary"
-                  {...register("maxSalary", { required: "Max Salary is required" })}
-                  placeholder="₹12,00,000"
+                  {...register("maxSalary", {
+                    required: "Max Salary is required",
+                    pattern: {
+                      value: /^[0-9]+(\.[0-9]{1,2})?$/,
+                      message: "Invalid salary format"
+                    },
+                    validate: (value, formValues) => parseFloat(value.replace(/[^0-9.]/g, "")) >= parseFloat(formValues.minSalary.replace(/[^0-9.]/g, "")) || "Max salary must be greater than or equal to min salary"
+                  })}
+                  placeholder="12,00,000"
                   className="w-full border-none outline-none bg-transparent"
                 />
               </div>
               {errors.maxSalary && <p className="text-red-500 text-xs mt-1">{errors.maxSalary.message}</p>}
             </div>
           </div>
-<div className="flex gap-4"> {/* Use flex and gap for half-half sizing */}
-            <div className="flex-1"> {/* flex-1 makes it take half available space */}
+
+          {/* Job Experience (Min & Max) */}
+          <div className="flex gap-4">
+            <div className="flex-1">
               <label htmlFor="minExperience" className="block text-gray-700 text-sm font-medium mb-1">Min Experience (Years)</label>
               <input
                 type="number"
                 id="minExperience"
-                {...register("minExperience", { required: "Min Experience is required", min: 0 })}
+                {...register("minExperience", {
+                  required: "Min Experience is required",
+                  min: { value: 0, message: "Minimum experience cannot be negative" },
+                  valueAsNumber: true // Convert input to number
+                })}
                 placeholder="0"
                 className="w-full border border-gray-300 rounded-md p-3 text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               />
               {errors.minExperience && <p className="text-red-500 text-xs mt-1">{errors.minExperience.message}</p>}
             </div>
-            <div className="flex-1"> {/* flex-1 makes it take half available space */}
+            <div className="flex-1">
               <label htmlFor="maxExperience" className="block text-gray-700 text-sm font-medium mb-1">Max Experience (Years)</label>
               <input
                 type="number"
                 id="maxExperience"
-                {...register("maxExperience", { required: "Max Experience is required", min: 0 })}
+                {...register("maxExperience", {
+                  required: "Max Experience is required",
+                  min: { value: 0, message: "Maximum experience cannot be negative" },
+                  valueAsNumber: true, // Convert input to number
+                  validate: (value, formValues) => value >= formValues.minExperience || "Max experience must be greater than or equal to min experience"
+                })}
                 placeholder="5"
                 className="w-full border border-gray-300 rounded-md p-3 text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               />
               {errors.maxExperience && <p className="text-red-500 text-xs mt-1">{errors.maxExperience.message}</p>}
             </div>
           </div>
+
           {/* Application Deadline */}
           <div>
             <label htmlFor="applicationDeadline" className="block text-gray-700 text-sm font-medium mb-1">Application Deadline</label>
@@ -208,7 +251,15 @@ const CreateJobModal = () => {
               <input
                 type="date"
                 id="applicationDeadline"
-                {...register("applicationDeadline", { required: "Application Deadline is required" })}
+                {...register("applicationDeadline", {
+                  required: "Application Deadline is required",
+                  validate: (value) => {
+                    const selectedDate = new Date(value);
+                    const currentDate = new Date();
+                    currentDate.setHours(0, 0, 0, 0); // Normalize current date to avoid time comparison issues
+                    return selectedDate >= currentDate || "Deadline cannot be in the past";
+                  }
+                })}
                 className="w-full border border-gray-300 rounded-md p-3 text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent appearance-none"
               />
               <Calendar className="absolute right-3 text-gray-500 pointer-events-none" size={20} />
@@ -216,7 +267,7 @@ const CreateJobModal = () => {
             {errors.applicationDeadline && <p className="text-red-500 text-xs mt-1">{errors.applicationDeadline.message}</p>}
           </div>
 
-          {/* Company Logo Input (File Upload) - Placed next to Application Deadline */}
+          {/* Company Logo Input (File Upload) */}
           <div>
             <label htmlFor="companyLogo" className="block text-gray-700 text-sm font-medium mb-1">Company Logo</label>
             <input
@@ -229,11 +280,8 @@ const CreateJobModal = () => {
             {errors.companyLogo && <p className="text-red-500 text-xs mt-1">{errors.companyLogo.message}</p>}
           </div>
 
-          {/* Job Experience (Min & Max) */}
-          
-
           {/* Job Description */}
-          <div className="sm:col-span-2"> {/* Span full width on small screens and up */}
+          <div className="sm:col-span-2">
             <label htmlFor="jobDescription" className="block text-gray-700 text-sm font-medium mb-1">Job Description</label>
             <textarea
               id="jobDescription"
@@ -246,7 +294,7 @@ const CreateJobModal = () => {
           </div>
 
           {/* Requirements */}
-          <div className="sm:col-span-2"> {/* Span full width */}
+          <div className="sm:col-span-2">
             <label htmlFor="requirements" className="block text-gray-700 text-sm font-medium mb-1">Requirements</label>
             <textarea
               id="requirements"
@@ -258,7 +306,7 @@ const CreateJobModal = () => {
           </div>
 
           {/* Responsibilities */}
-          <div className="sm:col-span-2"> {/* Span full width */}
+          <div className="sm:col-span-2">
             <label htmlFor="responsibilities" className="block text-gray-700 text-sm font-medium mb-1">Responsibilities</label>
             <textarea
               id="responsibilities"
@@ -272,13 +320,13 @@ const CreateJobModal = () => {
           {/* Action Buttons */}
           <div className="sm:col-span-2 flex justify-between items-center mt-6">
             <button
-              type="button" // Use type="button" to prevent form submission
+              type="button"
               onClick={handleCloseCreateJobModal}
               className="bg-gray-100 hover:bg-gray-200 text-gray-700 font-semibold py-3 px-6 rounded-lg shadow-md transition-colors duration-200 flex items-center"
             >
               Save Draft
               <img
-                src="downward.png" // Placeholder for arrow icon
+                src="downward.png"
                 alt="Arrow Icon"
                 className="ml-2"
                 width="16"
@@ -292,7 +340,7 @@ const CreateJobModal = () => {
             >
               Publish
               <img
-                src="forward.png" // Placeholder for arrow icon
+                src="forward.png"
                 alt="Arrow Icon"
                 className="ml-2"
                 width="16"

@@ -1,6 +1,7 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import { useState } from "react";
 import JobDetailsModal from './JobDetailsModal';
+import { JobContext } from '../context/JobContext';
 
 // Helper function to calculate time posted
 const calculateTimePosted = (createdAt) => {
@@ -20,137 +21,14 @@ const calculateTimePosted = (createdAt) => {
   }
 };
 
-// Mock data for job listings, updated with new structure and createdAt
-const mockJobs = [
-  {
-    id: 1,
-    jobTitle: "Full Stack Developer",
-    companyName: "Amazon",
-    location: "Onsite",
-    jobType: "Full-time",
-    salaryRange: "12LPA",
-    jobDescription: "A user-friendly interface lets you browse stunning photos and videos. Filter destinations based on interests and travel style, and create personalized.",
-    requirements: "Strong React, Node.js, MongoDB skills.",
-    responsibilities: "Develop and maintain full-stack applications.",
-    applicationDeadline: "2025-08-30T23:59:59Z",
-    jobExperience: "1-3 yr Exp",
-    imageUrl: "https://placehold.co/40x40/FF9900/FFFFFF?text=A", // Amazon-like logo
-    createdAt: new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString(), // 24 hours ago
-  },
-  {
-    id: 2,
-    jobTitle: "Node Js Developer",
-    companyName: "Tesla",
-    location: "Onsite",
-    jobType: "Full-time",
-    salaryRange: "12LPA",
-    jobDescription: "A user-friendly interface lets you browse stunning photos and videos. Filter destinations based on interests and travel style, and create personalized.",
-    requirements: "Expertise in Node.js and Express.js.",
-    responsibilities: "Build scalable backend APIs.",
-    applicationDeadline: "2025-09-01T23:59:59Z",
-    jobExperience: "1-3 yr Exp",
-    imageUrl: "https://placehold.co/40x40/000000/FFFFFF?text=T", // Tesla-like logo
-    createdAt: new Date(Date.now() - 48 * 60 * 60 * 1000).toISOString(), // 2 days ago
-  },
-  {
-    id: 3,
-    jobTitle: "UX/UI Designer",
-    companyName: "Swiggy",
-    location: "Onsite",
-    jobType: "Full-time",
-    salaryRange: "12LPA",
-    jobDescription: "A user-friendly interface lets you browse stunning photos and videos. Filter destinations based on interests and travel style, and create personalized.",
-    requirements: "Proficiency in Figma and user research.",
-    responsibilities: "Create intuitive user interfaces.",
-    applicationDeadline: "2025-08-25T23:59:59Z",
-    jobExperience: "1-3 yr Exp",
-    imageUrl: "https://placehold.co/40x40/FF6600/FFFFFF?text=S", // Swiggy-like logo
-    createdAt: new Date(Date.now() - 12 * 60 * 60 * 1000).toISOString(), // 12 hours ago
-  },
-  {
-    id: 4,
-    jobTitle: "Full Stack Developer",
-    companyName: "Amazon",
-    location: "Onsite",
-    jobType: "Full-time",
-    salaryRange: "12LPA",
-    jobDescription: "A user-friendly interface lets you browse stunning photos and videos. Filter destinations based on interests and travel style, and create personalized.",
-    requirements: "Strong React, Node.js, MongoDB skills.",
-    responsibilities: "Develop and maintain full-stack applications.",
-    applicationDeadline: "2025-08-30T23:59:59Z",
-    jobExperience: "1-3 yr Exp",
-    imageUrl: "https://placehold.co/40x40/FF9900/FFFFFF?text=A", // Amazon-like logo
-    createdAt: new Date(Date.now() - 36 * 60 * 60 * 1000).toISOString(), // 36 hours ago
-  },
-  {
-    id: 5,
-    jobTitle: "Node Js Developer",
-    companyName: "Tesla",
-    location: "Onsite",
-    jobType: "Full-time",
-    salaryRange: "12LPA",
-    jobDescription: "A user-friendly interface lets you browse stunning photos and videos. Filter destinations based on interests and travel style, and create personalized.",
-    requirements: "Expertise in Node.js and Express.js.",
-    responsibilities: "Build scalable backend APIs.",
-    applicationDeadline: "2025-09-01T23:59:59Z",
-    jobExperience: "1-3 yr Exp",
-    imageUrl: "https://placehold.co/40x40/000000/FFFFFF?text=T", // Tesla-like logo
-    createdAt: new Date(Date.now() - 60 * 60 * 60 * 1000).toISOString(), // 2.5 days ago
-  },
-  {
-    id: 6,
-    jobTitle: "UX/UI Designer",
-    companyName: "Swiggy",
-    location: "Onsite",
-    jobType: "Full-time",
-    salaryRange: "12LPA",
-    jobDescription: "A user-friendly interface lets you browse stunning photos and videos. Filter destinations based on interests and travel style, and create personalized.",
-    requirements: "Proficiency in Figma and user research.",
-    responsibilities: "Create intuitive user interfaces.",
-    applicationDeadline: "2025-08-25T23:59:59Z",
-    jobExperience: "1-3 yr Exp",
-    imageUrl: "https://placehold.co/40x40/FF6600/FFFFFF?text=S", // Swiggy-like logo
-    createdAt: new Date(Date.now() - 72 * 60 * 60 * 1000).toISOString(), // 3 days ago
-  },
-  {
-    id: 7,
-    jobTitle: "Full Stack Developer",
-    companyName: "Amazon",
-    location: "Onsite",
-    jobType: "Full-time",
-    salaryRange: "12LPA",
-    jobDescription: "A user-friendly interface lets you browse stunning photos and videos. Filter destinations based on interests and travel style, and create personalized.",
-    requirements: "Strong React, Node.js, MongoDB skills.",
-    responsibilities: "Develop and maintain full-stack applications.",
-    applicationDeadline: "2025-08-30T23:59:59Z",
-    jobExperience: "1-3 yr Exp",
-    imageUrl: "https://placehold.co/40x40/FF9900/FFFFFF?text=A", // Amazon-like logo
-    createdAt: new Date(Date.now() - 8 * 60 * 60 * 1000).toISOString(), // 8 hours ago
-  },
-  {
-    id: 8,
-    jobTitle: "Node Js Developer",
-    companyName: "Tesla",
-    location: "Onsite",
-    jobType: "Full-time",
-    salaryRange: "12LPA",
-    jobDescription: "A user-friendly interface lets you browse stunning photos and videos. Filter destinations based on interests and travel style, and create personalized.",
-    requirements: "Expertise in Node.js and Express.js.",
-    responsibilities: "Build scalable backend APIs.",
-    applicationDeadline: "2025-09-01T23:59:59Z",
-    jobExperience: "1-3 yr Exp",
-    imageUrl: "https://placehold.co/40x40/000000/FFFFFF?text=T", // Tesla-like logo
-    createdAt: new Date(Date.now() - 15 * 60 * 60 * 1000).toISOString(), // 15 hours ago
-  },
-];
-
 
   
 
 function JobCardGrid() {
 
 
-  const [selectedJob, setSelectedJob] = useState(null);
+const [selectedJob, setSelectedJob] = useState(null);
+ const {jobs} = useContext(JobContext);
 
   const handleCardClick = (job) => {
     setSelectedJob(job);
@@ -164,12 +42,12 @@ function JobCardGrid() {
   return (
     <div className="flex justify-center p-4 sm:p-6 lg:p-8 font-inter">
       {/* Grid container */}
-      <div className="w-full max-w-7xl grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-      {mockJobs.map((job) => {
+      <div className="w-full max-w-8xl grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+      {jobs.map((job) => {
       
 
         return (
-          <div key={job.id} className="bg-white rounded-lg shadow-md p-6 flex flex-col justify-between" onClick={() => handleCardClick(job)}>
+          <div key={job._id} className="bg-white rounded-lg shadow-md p-6 flex flex-col justify-between" onClick={() => handleCardClick(job)}>
             {/* Top section */}
             <div className="flex items-center justify-between mb-4">
               <div className="p-2 bg-white rounded-md shadow-md">
