@@ -1,9 +1,11 @@
 // components/JobDetailsModal.js (or a suitable path like modals/JobDetailsModal.js)
 
-import React from 'react';
+import React, { useState } from 'react';
+
 
 const JobDetailsModal = ({ job, onClose }) => {
   if (!job) return null; // Don't render if no job is provided
+  const [isApplied, setIsApplied] = useState(false);
 
   // Format application deadline
   const formattedDeadline = new Date(job.applicationDeadline).toLocaleDateString('en-US', {
@@ -112,9 +114,15 @@ const JobDetailsModal = ({ job, onClose }) => {
 
         {/* Apply Button at the bottom */}
         <div className="flex justify-center mt-4">
-          <button className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-8 rounded-lg shadow-lg transition-colors duration-200">
-            Apply Now
-          </button>
+        <button
+      onClick={() => setIsApplied(true)}
+      className={`${
+        isApplied ? "bg-green-600" : "bg-blue-600 hover:bg-blue-700"
+      } text-white font-bold py-3 px-8 rounded-lg shadow-lg transition-colors duration-200`}
+    >
+      {isApplied ? "Applied" : "Apply Now"}
+    </button>
+
         </div>
       </div>
     </div>

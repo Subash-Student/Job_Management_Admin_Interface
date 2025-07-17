@@ -149,13 +149,6 @@ const mockJobs = [
 
 function JobCardGrid() {
 
-  const [appliedJobs, setAppliedJobs] = useState([]);
-
-  const handleApply = (jobId) => {
-    if (!appliedJobs.includes(jobId)) {
-      setAppliedJobs((prev) => [...prev, jobId]);
-    }
-  }
 
   const [selectedJob, setSelectedJob] = useState(null);
 
@@ -173,7 +166,7 @@ function JobCardGrid() {
       {/* Grid container */}
       <div className="w-full max-w-7xl grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
       {mockJobs.map((job) => {
-        const isApplied = appliedJobs.includes(job.id);
+      
 
         return (
           <div key={job.id} className="bg-white rounded-lg shadow-md p-6 flex flex-col justify-between" onClick={() => handleCardClick(job)}>
@@ -183,7 +176,7 @@ function JobCardGrid() {
                 <img
                   src={job.imageUrl}
                   alt={`${job.companyName} Logo`}
-                  className="w-10 h-10 rounded-full"
+                  className="w-11 h-11 rounded-full"
                   onError={(e) => {
                     e.target.onerror = null;
                     e.target.src = "https://placehold.co/40x40/cccccc/000000?text=Logo";
@@ -251,16 +244,8 @@ function JobCardGrid() {
             </p>
 
             {/* Button */}
-            <button
-              onClick={() => handleApply(job.id)}
-              disabled={isApplied}
-              className={`${
-                isApplied
-                  ? "bg-green-500 cursor-not-allowed"
-                  : "bg-blue-500 hover:bg-blue-600"
-              } text-white font-semibold py-2 px-4 rounded-md transition-colors duration-200`}
-            >
-              {isApplied ? "Applied" : "Apply Now"}
+            <button className="bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-4 rounded-md transition-colors duration-200">
+              Apply Now
             </button>
           </div>
         );
