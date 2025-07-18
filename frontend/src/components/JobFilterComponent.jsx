@@ -198,7 +198,7 @@ export default function JobFilterBar() {
           aria-label="Reset Filters"
         >
           <RotateCcw size={18} />
-          <span className="hidden md:inline ml-1">Reset</span> {/* Show text on desktop only */}
+         
         </button>
       </div>
 

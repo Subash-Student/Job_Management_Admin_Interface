@@ -1,38 +1,74 @@
 import React, { useContext } from 'react';
-import { useForm } from 'react-hook-form';
+import { useForm, Controller } from 'react-hook-form';
 import * as Select from '@radix-ui/react-select';
 import { Calendar } from 'lucide-react';
 import { JobContext } from '../context/JobContext';
 
+const LOCAL_STORAGE_KEY = 'createJobDraft';
 
+
+const getInitialFormValues = () => {
+  const baseDefaults = {
+    jobType: 'Full-time',
+    jobTitle: '',
+    companyName: '',
+    location: '',
+    minSalary: '',
+    maxSalary: '',
+    minExperience: '',
+    maxExperience: '',
+    applicationDeadline: '',
+    jobDescription: '',
+    requirements: '',
+    responsibilities: '',
+    companyLogo: null,
+  };
+
+  const draft = localStorage.getItem(LOCAL_STORAGE_KEY);
+  if (draft) {
+    try {
+      const draftData = JSON.parse(draft);
+      return { ...baseDefaults, ...draftData };
+    } catch (e) {
+      console.error("Failed to parse draft", e);
+      return baseDefaults;
+    }
+  }
+  return baseDefaults;
+};
 
 
 const CreateJobModal = () => {
-
-  const { register, handleSubmit, watch, setValue, formState: { errors } } = useForm({
-    defaultValues: {
-      jobType: 'Full-time', 
-      
-    }
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+    getValues,
+    reset,
+    control,
+  } = useForm({
+  
+    defaultValues: getInitialFormValues(),
   });
 
-  const {handleCloseCreateJobModal,handleCreateJobSubmit} = useContext(JobContext);
+  const { handleCloseCreateJobModal, handleCreateJobSubmit } = useContext(JobContext);
 
- 
-  const jobType = watch('jobType');
 
- 
+  const handleSaveDraft = () => {
+    const values = getValues();
+    if (values.companyLogo instanceof FileList || Array.isArray(values.companyLogo)) {
+      values.companyLogo = null;
+    }
+    localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(values));
+    handleCloseCreateJobModal();
+  };
+
+  
   const handleFormSubmit = (data) => {
-    
-    
-
-    
+    localStorage.removeItem(LOCAL_STORAGE_KEY);
     const minExperience = parseFloat(data.minExperience);
     const maxExperience = parseFloat(data.maxExperience);
-
-    
     const companyLogoFile = data.companyLogo[0] || null;
-
     const formattedData = {
       companyLogo: companyLogoFile,
       jobTitle: data.jobTitle,
@@ -44,57 +80,93 @@ const CreateJobModal = () => {
       jobType: data.jobType,
       location: data.location,
       jobExperience: `${minExperience}-${maxExperience} yr Exp`,
-      minSalary:data.minSalary,
-      maxSalary:data.maxSalary
+      minSalary: data.minSalary,
+      maxSalary: data.maxSalary
     };
-    
-    handleCreateJobSubmit(formattedData)
-
+    handleCreateJobSubmit(formattedData);
   };
 
-  
   return (
     <div className="fixed inset-0 bg-gray-600 bg-opacity-50 flex justify-center items-center z-50 p-4 font-inter ">
       <div className="bg-white rounded-lg shadow-xl max-w-3xl w-full p-8 relative overflow-y-auto max-h-[90vh] scrollbar-hide">
-
-      
-        <button
-          onClick={handleCloseCreateJobModal}
-          className="absolute top-4 right-4 text-gray-500 hover:text-gray-700 text-2xl font-bold"
-        >
+        <button onClick={handleCloseCreateJobModal} className="absolute top-4 right-4 text-gray-500 hover:text-gray-700 text-2xl font-bold">
           &times;
         </button>
-
         <h2 className="text-2xl font-bold text-gray-800 mb-6 text-center">Create Job Opening</h2>
-
         <form onSubmit={handleSubmit(handleFormSubmit)} className="grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-6">
           
-          <div>
-            <label htmlFor="jobTitle" className="block text-gray-700 text-sm font-medium mb-1">Job Title</label>
-            <input
-              type="text"
-              id="jobTitle"
-              {...register("jobTitle", { required: "Job Title is required" })}
-              placeholder="Full Stack Developer"
-              className="w-full border border-gray-300 rounded-md p-3 text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-            />
-            {errors.jobTitle && <p className="text-red-500 text-xs mt-1">{errors.jobTitle.message}</p>}
-          </div>
+            {/* Job Title */}
+            <div>
+              <label htmlFor="jobTitle" className="block text-gray-700 text-sm font-medium mb-1">Job Title</label>
+              <input
+                type="text"
+                id="jobTitle"
+                {...register("jobTitle", { required: "Job Title is required" })}
+                placeholder="Full Stack Developer"
+                className="w-full border border-gray-300 rounded-md p-3 text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              />
+              {errors.jobTitle && <p className="text-red-500 text-xs mt-1">{errors.jobTitle.message}</p>}
+            </div>
 
-        
-          <div>
-            <label htmlFor="companyName" className="block text-gray-700 text-sm font-medium mb-1">Company Name</label>
-            <input
-              type="text"
-              id="companyName"
-              {...register("companyName", { required: "Company Name is required" })}
-              placeholder="Amazon, Microsoft, Swiggy"
-              className="w-full border border-gray-300 rounded-md p-3 text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-            />
-            {errors.companyName && <p className="text-red-500 text-xs mt-1">{errors.companyName.message}</p>}
-          </div>
+            {/* Company Name */}
+            <div>
+              <label htmlFor="companyName" className="block text-gray-700 text-sm font-medium mb-1">Company Name</label>
+              <input
+                type="text"
+                id="companyName"
+                {...register("companyName", { required: "Company Name is required" })}
+                placeholder="Amazon, Microsoft, Swiggy"
+                className="w-full border border-gray-300 rounded-md p-3 text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              />
+              {errors.companyName && <p className="text-red-500 text-xs mt-1">{errors.companyName.message}</p>}
+            </div>
+          
+           
 
-          {/* Location Input */}
+            {/* Job Type field  */}
+            <div>
+              <label htmlFor="jobType" className="block text-gray-700 text-sm font-medium mb-1">Job Type</label>
+              <Controller
+                name="jobType"
+                control={control}
+                rules={{ required: "Job Type is required" }}
+                render={({ field }) => (
+                  <Select.Root
+                    value={field.value}
+                    onValueChange={field.onChange}
+                  >
+                    <Select.Trigger className="flex w-full items-center justify-between text-sm text-gray-700 border border-gray-300 rounded-md p-3 bg-white outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                      <Select.Value placeholder="Select a job type..." />
+                      <Select.Icon className="ml-2">
+                        <svg className="fill-current h-4 w-4 text-gray-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
+                          <path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 6.757 7.586 5.343 9z"/>
+                        </svg>
+                      </Select.Icon>
+                    </Select.Trigger>
+                    <Select.Portal>
+                      <Select.Content className="bg-white rounded-md shadow-lg py-1 z-50 min-w-[var(--radix-select-trigger-width)]">
+                        <Select.Viewport className="p-1">
+                          <Select.Item value="Full-time" className="text-sm text-gray-700 px-3 py-2 rounded-md hover:bg-gray-100 cursor-pointer outline-none data-[highlighted]:bg-gray-100">
+                            <Select.ItemText>Full-time</Select.ItemText>
+                          </Select.Item>
+                          <Select.Item value="Part-time" className="text-sm text-gray-700 px-3 py-2 rounded-md hover:bg-gray-100 cursor-pointer outline-none data-[highlighted]:bg-gray-100">
+                            <Select.ItemText>Part-time</Select.ItemText>
+                          </Select.Item>
+                          <Select.Item value="Contract" className="text-sm text-gray-700 px-3 py-2 rounded-md hover:bg-gray-100 cursor-pointer outline-none data-[highlighted]:bg-gray-100">
+                            <Select.ItemText>Contract</Select.ItemText>
+                          </Select.Item>
+                          <Select.Item value="Internship" className="text-sm text-gray-700 px-3 py-2 rounded-md hover:bg-gray-100 cursor-pointer outline-none data-[highlighted]:bg-gray-100">
+                            <Select.ItemText>Internship</Select.ItemText>
+                          </Select.Item>
+                        </Select.Viewport>
+                      </Select.Content>
+                    </Select.Portal>
+                  </Select.Root>
+                )}
+              />
+              {errors.jobType && <p className="text-red-500 text-xs mt-1">{errors.jobType.message}</p>}
+            </div>
+
           <div>
             <label htmlFor="location" className="block text-gray-700 text-sm font-medium mb-1">Location</label>
             <input
@@ -106,46 +178,6 @@ const CreateJobModal = () => {
             />
             {errors.location && <p className="text-red-500 text-xs mt-1">{errors.location.message}</p>}
           </div>
-
-          
-          <div>
-            <label htmlFor="jobType" className="block text-gray-700 text-sm font-medium mb-1">Job Type</label>
-            <Select.Root
-              value={jobType}
-              onValueChange={(value) => setValue('jobType', value, { shouldValidate: true })}  
-            >
-              <Select.Trigger className="flex w-full items-center justify-between text-sm text-gray-700 border border-gray-300 rounded-md p-3 bg-white outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
-                <Select.Value>{jobType}</Select.Value>
-                <Select.Icon className="ml-2">
-                  <svg className="fill-current h-4 w-4 text-gray-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
-                    <path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 6.757 7.586 5.343 9z"/>
-                  </svg>
-                </Select.Icon>
-              </Select.Trigger>
-              <Select.Portal>
-                <Select.Content className="bg-white rounded-md shadow-lg py-1 z-50 min-w-[var(--radix-select-trigger-width)]">
-                  <Select.Viewport className="p-1">
-                    <Select.Item value="Full-time" className="text-sm text-gray-700 px-3 py-2 rounded-md hover:bg-gray-100 cursor-pointer outline-none data-[highlighted]:bg-gray-100">
-                      <Select.ItemText>Full-time</Select.ItemText>
-                    </Select.Item>
-                    <Select.Item value="Part-time" className="text-sm text-gray-700 px-3 py-2 rounded-md hover:bg-gray-100 cursor-pointer outline-none data-[highlighted]:bg-gray-100">
-                      <Select.ItemText>Part-time</Select.ItemText>
-                    </Select.Item>
-                    <Select.Item value="Contract" className="text-sm text-gray-700 px-3 py-2 rounded-md hover:bg-gray-100 cursor-pointer outline-none data-[highlighted]:bg-gray-100">
-                      <Select.ItemText>Contract</Select.ItemText>
-                    </Select.Item>
-                    <Select.Item value="Internship" className="text-sm text-gray-700 px-3 py-2 rounded-md hover:bg-gray-100 cursor-pointer outline-none data-[highlighted]:bg-gray-100">
-                      <Select.ItemText>Internship</Select.ItemText>
-                    </Select.Item>
-                  </Select.Viewport>
-                </Select.Content>
-              </Select.Portal>
-            </Select.Root>
-            {/* Hidden input to ensure react-hook-form registers the field. Value is set via setValue. */}
-            <input type="hidden" {...register("jobType", { required: "Job Type is required" })} />
-            {errors.jobType && <p className="text-red-500 text-xs mt-1">{errors.jobType.message}</p>}
-          </div>
-
           {/* Salary Range (Min & Max) */}
           <div className="flex gap-4">
             <div className="flex-1">
@@ -303,7 +335,7 @@ const CreateJobModal = () => {
           <div className="sm:col-span-2 flex justify-between items-center mt-6">
             <button
               type="button"
-              onClick={handleCloseCreateJobModal}
+              onClick={handleSaveDraft}
               className="bg-gray-100 hover:bg-gray-200 text-gray-700 font-semibold py-3 px-6 rounded-lg shadow-md transition-colors duration-200 flex items-center"
             >
               Save Draft
