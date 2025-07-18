@@ -14,12 +14,15 @@ const App = () => {
     
     <div className="h-screen bg-white dark:bg-blue-50">
       <ToastContainer />
-    {isLoading && <Loader />}
     <div >
+    {isLoading ? <Loader />:
+    <>
       <Navbar />
       <JobFilterComponent />
       <JobCardGrid />
       {showCreateJobModal && <CreateJobModal />}
+    </>
+    }
     </div>
   </div>
       

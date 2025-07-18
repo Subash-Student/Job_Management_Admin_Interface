@@ -68,7 +68,7 @@ const JobProvider = ({ children }) => {
 
       const response = await axios.post(CREATE_JOB_ENDPOINT, dataToSend);
      
-      if(response.success){
+      if(response.data.success){
         await fetchJobs();
         setShowCreateJobModal(false);
         toast.success(response.data.message)

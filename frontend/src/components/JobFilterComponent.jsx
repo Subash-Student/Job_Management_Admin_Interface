@@ -150,7 +150,7 @@ export default function JobFilterBar() {
           <Select.Portal>
             <Select.Content className="bg-white rounded-md shadow-lg py-1 z-50 min-w-[var(--radix-select-trigger-width)]">
               <Select.Viewport className="p-1">
-                {["default-job-type", "Full-time", "Internship", "Freelance", "Contract"].map((type) => (
+                {["default-job-type", "Full-time", "Internship", "Part-time", "Contract"].map((type) => (
                   <Select.Item
                     key={type}
                     value={type}
@@ -166,7 +166,7 @@ export default function JobFilterBar() {
       </div>
 
       <div className="hidden md:flex flex-col min-w-[220px] h-[48px] justify-center ml-4">
-        <span className="text-sm text-gray-700 mb-1">Salary Per Month</span>
+        <span className="text-sm text-gray-700 mb-1">Salary Per Year</span>
         <Slider.Root
           className="relative flex items-center select-none touch-none w-full h-5"
           min={100}
@@ -273,7 +273,7 @@ export default function JobFilterBar() {
                   <Select.Portal>
                     <Select.Content className="bg-white rounded-md shadow-lg py-1 z-50 w-[var(--radix-select-trigger-width)]">
                       <Select.Viewport className="p-1">
-                        {["default-job-type", "Full-time", "Internship", "Freelance", "Contract"].map((type) => (
+                        {["default-job-type", "Full-time", "Internship", "Part-time", "Contract"].map((type) => (
                           <Select.Item
                             key={type}
                             value={type}
@@ -290,7 +290,7 @@ export default function JobFilterBar() {
 
               {/* Salary Slider */}
               <div className="flex flex-col mt-2">
-                <span className="text-sm text-gray-700 mb-2">Salary Per Month</span>
+                <span className="text-sm text-gray-700 mb-2">Salary Per Year</span>
                 <Slider.Root
                   className="relative flex items-center select-none touch-none w-full h-5"
                   min={100}

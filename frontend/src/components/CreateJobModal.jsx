@@ -121,7 +121,17 @@ const CreateJobModal = () => {
               {errors.companyName && <p className="text-red-500 text-xs mt-1">{errors.companyName.message}</p>}
             </div>
           
-           
+            <div>
+            <label htmlFor="location" className="block text-gray-700 text-sm font-medium mb-1">Location</label>
+            <input
+              type="text"
+              id="location"
+              {...register("location", { required: "Location is required" })}
+              placeholder="Choose Prefered Location"
+              className="w-full border border-gray-300 rounded-md p-3 text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            />
+            {errors.location && <p className="text-red-500 text-xs mt-1">{errors.location.message}</p>}
+          </div>
 
             {/* Job Type field  */}
             <div>
@@ -167,17 +177,7 @@ const CreateJobModal = () => {
               {errors.jobType && <p className="text-red-500 text-xs mt-1">{errors.jobType.message}</p>}
             </div>
 
-          <div>
-            <label htmlFor="location" className="block text-gray-700 text-sm font-medium mb-1">Location</label>
-            <input
-              type="text"
-              id="location"
-              {...register("location", { required: "Location is required" })}
-              placeholder="Chennai, Bangalore, Kochi"
-              className="w-full border border-gray-300 rounded-md p-3 text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-            />
-            {errors.location && <p className="text-red-500 text-xs mt-1">{errors.location.message}</p>}
-          </div>
+          
           {/* Salary Range (Min & Max) */}
           <div className="flex gap-4">
             <div className="flex-1">
