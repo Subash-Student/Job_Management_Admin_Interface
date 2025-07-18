@@ -5,10 +5,8 @@ import * as Select from "@radix-ui/react-select";
 import * as Dialog from "@radix-ui/react-dialog";
 import { JobContext } from "../context/JobContext";
 
-/**
- * Filter logic
- */
-function applyFilter(jobs, filters) {
+
+ function applyFilter(jobs, filters) {
   const {
     jobTitle = '',
     location = '',
@@ -22,40 +20,68 @@ function applyFilter(jobs, filters) {
   const normalizedLocation = normalize(location);
   const normalizedJobType = normalize(jobType);
 
-  const minS = parseInt(minSalary);
-  const maxS = parseInt(maxSalary);
+  
+  const minS = minSalary;
+  const maxS = maxSalary;
 
-  return jobs.filter((job) => {
+  console.log(
+    '%c[SalaryFilter] Filter Range: ',
+    'background: #222; color: #0ff',
+    `minS: ${minS}`, `maxS: ${maxS}`
+  );
+
+  return jobs.filter((job, idx) => {
     const jobTitleNorm = normalize(job.jobTitle);
     const locationNorm = normalize(job.location);
     const jobTypeNorm = normalize(job.jobType);
 
-    let match = true;
+    const jobMin = parseInt(job.minSalary, 10);
+    const jobMax = parseInt(job.maxSalary, 10);
 
+
+    console.log(
+      `%c[SalaryFilter] Job ${idx + 1}: ${job.jobTitle} | jobMin: ${jobMin}, jobMax: ${jobMax}`,
+      'color: #ffa500'
+    );
+    
+   
     if (normalizedJobTitle && !jobTitleNorm.includes(normalizedJobTitle)) {
-      match = false;
+      console.log(`%c> Excluded: jobTitle doesn't match`, 'color: #f00');
+      return false;
     }
-
     if (normalizedLocation && !locationNorm.includes(normalizedLocation)) {
-      match = false;
+      console.log(`%c> Excluded: location doesn't match`, 'color: #f00');
+      return false;
+    }
+    if (
+      normalizedJobType &&
+      normalizedJobType !== 'default-job-type' &&
+      jobTypeNorm !== normalizedJobType
+    ) {
+      console.log(`%c> Excluded: jobType doesn't match`, 'color: #f00');
+      return false;
     }
 
-    if (normalizedJobType && normalizedJobType !== 'default-job-type' && jobTypeNorm !== normalizedJobType) {
-      match = false;
+    
+    if (isNaN(jobMin) || isNaN(jobMax)) {
+      console.log('%c> Excluded: Invalid job min or max salary', 'color: #f00');
+      return false; 
     }
+    if (jobMin < minS || jobMax > maxS) return false;
 
-    if ((minSalary || maxSalary) && job.minSalary && job.maxSalary) {
-      if (minSalary && job.maxSalary < minS) match = false;
-      if (maxSalary && job.minSalary > maxS) match = false;
-    }
 
-    return match;
+    console.log('%c> Included: Passed all filters!', 'color: #0a0');
+    return true; 
   });
 }
 
+
+
+
+
 export default function JobFilterBar() {
-  const initialMinSalary = 150;
-  const initialMaxSalary = 2000;
+  const initialMinSalary = 1;
+  const initialMaxSalary = 12;
   const initialSelectedLocation = '';
   const initialSelectedJobType = 'default-job-type';
   const initialJobTitle = "";
@@ -84,8 +110,8 @@ export default function JobFilterBar() {
       jobTitle,
       location: selectedLocation,
       jobType: selectedJobType,
-      minSalary: minSalary * 1000,
-      maxSalary: maxSalary * 1000,
+      minSalary: minSalary * 100000,
+      maxSalary: maxSalary * 100000,
     };
 
     const filtered = applyFilter(localAllJobs, filters);
@@ -169,9 +195,9 @@ export default function JobFilterBar() {
         <span className="text-sm text-gray-700 mb-1">Salary Per Year</span>
         <Slider.Root
           className="relative flex items-center select-none touch-none w-full h-5"
-          min={100}
-          max={2000}
-          step={10}
+          min={2}
+          max={12}
+          
           value={[minSalary, maxSalary]}
           onValueChange={handleSalaryChange}
         >
@@ -186,7 +212,7 @@ export default function JobFilterBar() {
           ))}
         </Slider.Root>
         <div className="text-xs text-gray-500 mt-1">
-          ₹{minSalary}k - ₹{maxSalary}k
+          ₹{minSalary} LPA - ₹{maxSalary} LPA
         </div>
       </div>
 
@@ -293,9 +319,8 @@ export default function JobFilterBar() {
                 <span className="text-sm text-gray-700 mb-2">Salary Per Year</span>
                 <Slider.Root
                   className="relative flex items-center select-none touch-none w-full h-5"
-                  min={100}
-                  max={2000}
-                  step={10}
+                  min={2}
+                  max={12}
                   value={[minSalary, maxSalary]}
                   onValueChange={handleSalaryChange}
                 >
@@ -310,7 +335,7 @@ export default function JobFilterBar() {
                   ))}
                 </Slider.Root>
                 <div className="text-xs text-gray-500 mt-1">
-                  ₹{minSalary}k - ₹{maxSalary}k
+                  ₹{minSalary} LPA - ₹{maxSalary} LPA
                 </div>
               </div>
             </div>
