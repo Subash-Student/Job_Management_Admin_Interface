@@ -1,16 +1,15 @@
-// components/JobDetailsModal.js (or a suitable path like modals/JobDetailsModal.js)
 
 import React, { useContext, useState } from 'react';
 import { JobContext } from '../context/JobContext';
 
 
 const JobDetailsModal = ({ job, onClose }) => {
-  if (!job) return null; // Don't render if no job is provided
+  if (!job) return null; 
   const [isApplied, setIsApplied] = useState(false);
 
   const {formatSalaryRange} = useContext(JobContext)
 
-  // Format application deadline
+  
   const formattedDeadline = new Date(job.applicationDeadline).toLocaleDateString('en-US', {
     year: 'numeric',
     month: 'long',
@@ -20,7 +19,7 @@ const JobDetailsModal = ({ job, onClose }) => {
   return (
     <div className="fixed inset-0 bg-gray-600 bg-opacity-50 flex justify-center items-center z-50 p-4 font-inter">
       <div className="bg-white rounded-lg shadow-xl max-w-2xl w-full p-6 relative overflow-y-auto max-h-[90vh]">
-        {/* Close Button */}
+        
         <button
           onClick={onClose}
           className="absolute top-4 right-4 text-gray-500 hover:text-gray-700 text-2xl font-bold"
@@ -28,7 +27,7 @@ const JobDetailsModal = ({ job, onClose }) => {
           &times;
         </button>
 
-        {/* Company Logo and Title */}
+        
         <div className="flex items-center mb-6">
           <div className="p-2 bg-white rounded-md shadow-md mr-4">
             <img
@@ -44,7 +43,7 @@ const JobDetailsModal = ({ job, onClose }) => {
           </div>
         </div>
 
-        {/* Key Details */}
+        
         <div className="flex items-center text-gray-600 text-sm mb-4 space-x-3">
               <div className="flex items-center">
                 <img
@@ -99,7 +98,7 @@ const JobDetailsModal = ({ job, onClose }) => {
           </div>
             </div>
 
-        {/* Sections: Description, Requirements, Responsibilities */}
+       
         <div className="mb-6">
           <h3 className="text-xl font-semibold text-gray-800 mb-2">Job Description</h3>
           <p className="text-gray-700 text-base leading-relaxed">{job.jobDescription}</p>
@@ -115,7 +114,7 @@ const JobDetailsModal = ({ job, onClose }) => {
           <p className="text-gray-700 text-base leading-relaxed">{job.responsibilities}</p>
         </div>
 
-        {/* Apply Button at the bottom */}
+       
         <div className="flex justify-center mt-4">
         <button
       onClick={() => setIsApplied(true)}

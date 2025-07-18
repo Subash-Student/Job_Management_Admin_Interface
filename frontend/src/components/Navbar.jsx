@@ -20,7 +20,7 @@ function Navbar() {
             src={logoPlaceholder}
             alt="Company Logo"
             className="h-10 w-10 ml-3  rounded-full"
-            onError={(e) => { e.target.onerror = null; e.target.src = "https://placehold.co/40x40/cccccc/000000?text=Logo"; }} // Fallback
+            onError={(e) => { e.target.onerror = null; e.target.src = "https://placehold.co/40x40/cccccc/000000?text=Logo"; }} 
           />
         </div>
 

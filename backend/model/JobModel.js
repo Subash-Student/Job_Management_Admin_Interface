@@ -39,7 +39,7 @@ const jobSchema = new mongoose.Schema({
     },
     jobExperience: {
         type: String,
-        required: [true, 'Job Experience is required'], // Make it required
+        required: [true, 'Job Experience is required'], 
         trim: true
     },
     jobDescription: {

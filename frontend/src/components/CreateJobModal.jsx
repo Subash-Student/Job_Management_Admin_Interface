@@ -8,7 +8,7 @@ import { JobContext } from '../context/JobContext';
 
 
 const CreateJobModal = () => {
-  // Set default value for jobType to "Full-time"
+
   const { register, handleSubmit, watch, setValue, formState: { errors } } = useForm({
     defaultValues: {
       jobType: 'Full-time', 
@@ -18,19 +18,19 @@ const CreateJobModal = () => {
 
   const {handleCloseCreateJobModal,handleCreateJobSubmit} = useContext(JobContext);
 
-  // Watch for changes in jobType for Radix Select display
-  const jobType = watch('jobType'); // No default here, as it's set in useForm
+ 
+  const jobType = watch('jobType');
 
-  // Function to handle form submission
+ 
   const handleFormSubmit = (data) => {
-    // Convert salary strings to numbers
+    
     
 
-    // Experience values are already numbers due to type="number"
+    
     const minExperience = parseFloat(data.minExperience);
     const maxExperience = parseFloat(data.maxExperience);
 
-    // Get the first file from the FileList if one was uploaded
+    
     const companyLogoFile = data.companyLogo[0] || null;
 
     const formattedData = {
@@ -56,7 +56,7 @@ const CreateJobModal = () => {
     <div className="fixed inset-0 bg-gray-600 bg-opacity-50 flex justify-center items-center z-50 p-4 font-inter ">
       <div className="bg-white rounded-lg shadow-xl max-w-3xl w-full p-8 relative overflow-y-auto max-h-[90vh] scrollbar-hide">
 
-        {/* Close Button */}
+      
         <button
           onClick={handleCloseCreateJobModal}
           className="absolute top-4 right-4 text-gray-500 hover:text-gray-700 text-2xl font-bold"
@@ -67,7 +67,7 @@ const CreateJobModal = () => {
         <h2 className="text-2xl font-bold text-gray-800 mb-6 text-center">Create Job Opening</h2>
 
         <form onSubmit={handleSubmit(handleFormSubmit)} className="grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-6">
-          {/* Job Title */}
+          
           <div>
             <label htmlFor="jobTitle" className="block text-gray-700 text-sm font-medium mb-1">Job Title</label>
             <input
@@ -80,7 +80,7 @@ const CreateJobModal = () => {
             {errors.jobTitle && <p className="text-red-500 text-xs mt-1">{errors.jobTitle.message}</p>}
           </div>
 
-          {/* Company Name */}
+        
           <div>
             <label htmlFor="companyName" className="block text-gray-700 text-sm font-medium mb-1">Company Name</label>
             <input
@@ -106,15 +106,15 @@ const CreateJobModal = () => {
             {errors.location && <p className="text-red-500 text-xs mt-1">{errors.location.message}</p>}
           </div>
 
-          {/* Job Type Dropdown (Radix UI Select) */}
+          
           <div>
             <label htmlFor="jobType" className="block text-gray-700 text-sm font-medium mb-1">Job Type</label>
             <Select.Root
               value={jobType}
-              onValueChange={(value) => setValue('jobType', value, { shouldValidate: true })} // Trigger validation on change
+              onValueChange={(value) => setValue('jobType', value, { shouldValidate: true })}  
             >
               <Select.Trigger className="flex w-full items-center justify-between text-sm text-gray-700 border border-gray-300 rounded-md p-3 bg-white outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
-                <Select.Value>{jobType}</Select.Value> {/* Displays current value */}
+                <Select.Value>{jobType}</Select.Value>
                 <Select.Icon className="ml-2">
                   <svg className="fill-current h-4 w-4 text-gray-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
                     <path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 6.757 7.586 5.343 9z"/>
@@ -152,12 +152,12 @@ const CreateJobModal = () => {
               <div className="flex items-center border border-gray-300 rounded-md p-3 text-gray-800 focus-within:ring-2 focus-within:ring-blue-500 focus-within:border-transparent">
                 <span className="text-gray-500 mr-2">₹</span>
                 <input
-                  type="text" // Keep as text to allow currency formatting input
+                  type="text" 
                   id="minSalary"
                   {...register("minSalary", {
                     required: "Min Salary is required",
                     pattern: {
-                      value: /^[0-9]+(\.[0-9]{1,2})?$/, // Basic regex for numbers (optional decimals)
+                      value: /^[0-9]+(\.[0-9]{1,2})?$/, 
                       message: "Invalid salary format"
                     }
                   })}
@@ -172,7 +172,7 @@ const CreateJobModal = () => {
               <div className="flex items-center border border-gray-300 rounded-md p-3 text-gray-800 focus-within:ring-2 focus-within:ring-blue-500 focus-within:border-transparent">
                 <span className="text-gray-500 mr-2">₹</span>
                 <input
-                  type="text" // Keep as text to allow currency formatting input
+                  type="text" 
                   id="maxSalary"
                   {...register("maxSalary", {
                     required: "Max Salary is required",
@@ -200,7 +200,7 @@ const CreateJobModal = () => {
                 {...register("minExperience", {
                   required: "Min Experience is required",
                   min: { value: 0, message: "Minimum experience cannot be negative" },
-                  valueAsNumber: true // Convert input to number
+                  valueAsNumber: true 
                 })}
                 placeholder="0"
                 className="w-full border border-gray-300 rounded-md p-3 text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
@@ -215,7 +215,7 @@ const CreateJobModal = () => {
                 {...register("maxExperience", {
                   required: "Max Experience is required",
                   min: { value: 0, message: "Maximum experience cannot be negative" },
-                  valueAsNumber: true, // Convert input to number
+                  valueAsNumber: true, 
                   validate: (value, formValues) => value >= formValues.minExperience || "Max experience must be greater than or equal to min experience"
                 })}
                 placeholder="5"
@@ -225,7 +225,7 @@ const CreateJobModal = () => {
             </div>
           </div>
 
-          {/* Application Deadline */}
+          
           <div>
             <label htmlFor="applicationDeadline" className="block text-gray-700 text-sm font-medium mb-1">Application Deadline</label>
             <div className="relative flex items-center">
@@ -237,7 +237,7 @@ const CreateJobModal = () => {
                   validate: (value) => {
                     const selectedDate = new Date(value);
                     const currentDate = new Date();
-                    currentDate.setHours(0, 0, 0, 0); // Normalize current date to avoid time comparison issues
+                    currentDate.setHours(0, 0, 0, 0); 
                     return selectedDate >= currentDate || "Deadline cannot be in the past";
                   }
                 })}
@@ -248,20 +248,20 @@ const CreateJobModal = () => {
             {errors.applicationDeadline && <p className="text-red-500 text-xs mt-1">{errors.applicationDeadline.message}</p>}
           </div>
 
-          {/* Company Logo Input (File Upload) */}
+         
           <div>
             <label htmlFor="companyLogo" className="block text-gray-700 text-sm font-medium mb-1">Company Logo</label>
             <input
               type="file"
               id="companyLogo"
               {...register("companyLogo", { required: "Company Logo is required" })}
-              accept="image/*" // Only accept image files
+              accept="image/*" 
               className="w-full border border-gray-300 rounded-md p-2 text-gray-800 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
             />
             {errors.companyLogo && <p className="text-red-500 text-xs mt-1">{errors.companyLogo.message}</p>}
           </div>
 
-          {/* Job Description */}
+         
           <div className="sm:col-span-2">
             <label htmlFor="jobDescription" className="block text-gray-700 text-sm font-medium mb-1">Job Description</label>
             <textarea
