@@ -47,7 +47,7 @@ const JobProvider = ({ children }) => {
 
   useEffect(() => {
     fetchJobs();
-  }, [fetchJobs,]);
+  }, [fetchJobs]);
 
 
 
