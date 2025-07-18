@@ -19,7 +19,7 @@ app.use(express.json());
 
 const allowedOrigins = [
     'http://localhost:5173',
-    `${process.env.FRONEND_URL}`
+    `https://job-management-admin-interface-rho.vercel.app`
   ];
   
   app.use(cors({
